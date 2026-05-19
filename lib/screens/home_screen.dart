@@ -10,34 +10,26 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<AlbumProvider>();
-
-    final groupedData = provider.stickersByGroup;
-    final allStickers = provider.stickers;
-    final owned = allStickers.where((s) => s.isCollected).length;
-    final total = allStickers.length;
-    final progress = total > 0 ? owned / total : 0.0;
+    final groupedData = context.read<AlbumProvider>().stickersByGroup;
+    final groupKeys = groupedData.keys.toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E1A),
       body: Column(
         children: [
-          // Header
-          _buildFixedHeader(context, owned, total, progress),
+          const _Header(),
 
-          // Grupos
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-              itemCount: groupedData.length,
+              itemCount: groupKeys.length,
               itemBuilder: (context, index) {
-                final groupName = groupedData.keys.elementAt(index);
+                final groupName = groupKeys[index];
                 final teamsMap = groupedData[groupName]!;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Título do Grupo
                     Padding(
                       padding: const EdgeInsets.fromLTRB(8, 24, 8, 16),
                       child: Row(
@@ -60,18 +52,10 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    // Renderiza os times dos respectivos grupos
                     ...teamsMap.entries.map((entry) {
-                      final teamName = entry.key;
-                      final teamStickers = entry.value;
-                      final teamOwned = teamStickers
-                          .where((s) => s.isCollected)
-                          .length;
-
                       return _TeamSection(
-                        teamName: teamName,
-                        stickers: teamStickers,
-                        ownedCount: teamOwned,
+                        teamName: entry.key,
+                        stickers: entry.value,
                       );
                     }),
                   ],
@@ -83,13 +67,17 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildFixedHeader(
-    BuildContext context,
-    int owned,
-    int total,
-    double progress,
-  ) {
+class _Header extends StatelessWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context) {
+    final owned = context.select<AlbumProvider, int>((p) => p.collectedCount);
+    final total = context.select<AlbumProvider, int>((p) => p.stickers.length);
+    final progress = total > 0 ? owned / total : 0.0;
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -149,7 +137,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              // Barra de progresso
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -191,17 +178,11 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// Seção de time
 class _TeamSection extends StatefulWidget {
   final String teamName;
   final List<Sticker> stickers;
-  final int ownedCount;
 
-  const _TeamSection({
-    required this.teamName,
-    required this.stickers,
-    required this.ownedCount,
-  });
+  const _TeamSection({required this.teamName, required this.stickers});
 
   @override
   State<_TeamSection> createState() => _TeamSectionState();
@@ -212,8 +193,10 @@ class _TeamSectionState extends State<_TeamSection> {
 
   @override
   Widget build(BuildContext context) {
+    final owned = context.select<AlbumProvider, int>(
+      (p) => widget.stickers.where((s) => s.isCollected).length,
+    );
     final total = widget.stickers.length;
-    final owned = widget.ownedCount;
     final pct = total > 0 ? owned / total : 0.0;
     final isComplete = owned == total && total > 0;
 
@@ -233,14 +216,12 @@ class _TeamSectionState extends State<_TeamSection> {
                 BoxShadow(
                   color: const Color(0xFFFFB800).withValues(alpha: 0.08),
                   blurRadius: 20,
-                  spreadRadius: 0,
                 ),
               ]
             : null,
       ),
       child: Column(
         children: [
-          // Cabeçalho do time
           InkWell(
             onTap: () => setState(() => _isExpanded = !_isExpanded),
             borderRadius: BorderRadius.circular(16),
@@ -257,11 +238,8 @@ class _TeamSectionState extends State<_TeamSection> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: isComplete
-                            ? [const Color(0xFFFFB800), const Color(0xFFFF6B00)]
-                            : [
-                                const Color(0xFF3B82F6),
-                                const Color(0xFF1D4ED8),
-                              ],
+                            ? const [Color(0xFFFFB800), Color(0xFFFF6B00)]
+                            : const [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
                       ),
                     ),
                   ),
@@ -354,7 +332,6 @@ class _TeamSectionState extends State<_TeamSection> {
               ),
             ),
           ),
-          // Grid de figurinhas
           AnimatedCrossFade(
             duration: const Duration(milliseconds: 250),
             crossFadeState: _isExpanded
@@ -372,9 +349,8 @@ class _TeamSectionState extends State<_TeamSection> {
                   mainAxisSpacing: 8,
                 ),
                 itemCount: widget.stickers.length,
-                itemBuilder: (context, gridIndex) {
-                  return StickerCard(sticker: widget.stickers[gridIndex]);
-                },
+                itemBuilder: (context, i) =>
+                    StickerCard(sticker: widget.stickers[i]),
               ),
             ),
             secondChild: const SizedBox.shrink(),

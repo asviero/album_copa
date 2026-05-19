@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,6 +8,8 @@ import '../models/sticker.dart';
 class AlbumProvider with ChangeNotifier {
   final List<Sticker> _stickers = [];
   SharedPreferences? _prefs;
+  Timer? _saveDebounce;
+  Map<String, Map<String, List<Sticker>>>? _stickersByGroupCache;
 
   AlbumProvider() {
     _generateInitialStickers();
@@ -14,33 +18,19 @@ class AlbumProvider with ChangeNotifier {
 
   List<Sticker> get stickers => _stickers;
 
-  Map<String, Map<String, List<Sticker>>> get stickersByGroup {
-    final map = <String, Map<String, List<Sticker>>>{};
+  int get collectedCount => _stickers.where((s) => s.isCollected).length;
 
+  Map<String, Map<String, List<Sticker>>> get stickersByGroup {
+    if (_stickersByGroupCache != null) return _stickersByGroupCache!;
+
+    final map = <String, Map<String, List<Sticker>>>{};
     for (var sticker in _stickers) {
-      if (!map.containsKey(sticker.group)) {
-        map[sticker.group] = {};
-      }
-      if (!map[sticker.group]!.containsKey(sticker.team)) {
-        map[sticker.group]![sticker.team] = [];
-      }
+      (map[sticker.group] ??= {})[sticker.team] ??= [];
       map[sticker.group]![sticker.team]!.add(sticker);
     }
-
-    final sortedGroups = map.keys.toList()..sort();
-    final sortedMap = <String, Map<String, List<Sticker>>>{};
-
-    for (var group in sortedGroups) {
-      final teamsMap = map[group]!;
-      final originalTeams = teamsMap.keys.toList();
-      final sortedTeamsMap = <String, List<Sticker>>{};
-
-      for (var team in originalTeams) {
-        sortedTeamsMap[team] = teamsMap[team]!;
-      }
-      sortedMap[group] = sortedTeamsMap;
-    }
-    return sortedMap;
+    final sortedKeys = map.keys.toList()..sort();
+    _stickersByGroupCache = {for (var k in sortedKeys) k: map[k]!};
+    return _stickersByGroupCache!;
   }
 
   void _generateInitialStickers() {
@@ -107,14 +97,14 @@ class AlbumProvider with ChangeNotifier {
       },
       'Grupo K': {
         'COL': 'Colômbia',
-        'COD': 'RD Congo',
         'POR': 'Portugal',
+        'COD': 'RD Congo',
         'UZB': 'Uzbequistão',
       },
       'Grupo L': {
         'CRO': 'Croácia',
-        'ENG': 'Inglaterra',
         'GHA': 'Gana',
+        'ENG': 'Inglaterra',
         'PAN': 'Panamá',
       },
     };
@@ -122,7 +112,7 @@ class AlbumProvider with ChangeNotifier {
     groups.forEach((groupName, teams) {
       teams.forEach((prefix, name) {
         for (int i = 1; i <= 20; i++) {
-          String tipo = i == 1
+          final tipo = i == 1
               ? 'Bandeira/Escudo'
               : (i == 2 ? 'Foto do Time' : 'Jogador');
           _stickers.add(
@@ -138,33 +128,35 @@ class AlbumProvider with ChangeNotifier {
     });
   }
 
-  // --- LÓGICA DE SALVAMENTO ---
   Future<void> _loadData() async {
     _prefs = await SharedPreferences.getInstance();
-    // Lista de códigos salvos
     final collectedCodes = _prefs?.getStringList('collected_stickers') ?? [];
-
     for (var sticker in _stickers) {
-      if (collectedCodes.contains(sticker.code)) {
-        sticker.isCollected = true;
-      }
+      if (collectedCodes.contains(sticker.code)) sticker.isCollected = true;
     }
     notifyListeners();
   }
 
   Future<void> _saveData() async {
     if (_prefs == null) return;
-    final collectedCodes = _stickers
+    final codes = _stickers
         .where((s) => s.isCollected)
         .map((s) => s.code)
         .toList();
-    await _prefs?.setStringList('collected_stickers', collectedCodes);
+    await _prefs!.setStringList('collected_stickers', codes);
   }
 
   void toggleSticker(String code) {
     final sticker = _stickers.firstWhere((s) => s.code == code);
     sticker.isCollected = !sticker.isCollected;
-    _saveData();
     notifyListeners();
+    _saveDebounce?.cancel();
+    _saveDebounce = Timer(const Duration(milliseconds: 500), _saveData);
+  }
+
+  @override
+  void dispose() {
+    _saveDebounce?.cancel();
+    super.dispose();
   }
 }

@@ -11,10 +11,11 @@ class StickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isCollected = sticker.isCollected;
+    final isCollected = context.select<AlbumProvider, bool>(
+      (p) => p.stickers.firstWhere((s) => s.code == sticker.code).isCollected,
+    );
 
     return GestureDetector(
-      // onTap para marcar/desmarcar figurinha
       onTap: () => context.read<AlbumProvider>().toggleSticker(sticker.code),
       child: Container(
         decoration: BoxDecoration(
@@ -27,14 +28,14 @@ class StickerCard extends StatelessWidget {
             width: 2,
           ),
           boxShadow: isCollected
-              ? [
+              ? const [
                   BoxShadow(
-                    color: const Color(0xFF00A881).withValues(alpha: 0.4),
+                    color: Color(0x6600A881),
                     blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    offset: Offset(0, 4),
                   ),
                 ]
-              : [],
+              : const [],
         ),
         alignment: Alignment.center,
         child: Text(

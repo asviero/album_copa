@@ -5,7 +5,10 @@ import 'package:provider/provider.dart';
 import 'providers/album_provider.dart';
 import 'screens/home_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GoogleFonts.pendingFonts([GoogleFonts.inter()]);
+
   runApp(
     MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => AlbumProvider())],
