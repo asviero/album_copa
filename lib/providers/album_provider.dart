@@ -32,15 +32,14 @@ class AlbumProvider with ChangeNotifier {
 
     for (var group in sortedGroups) {
       final teamsMap = map[group]!;
-      final sortedTeams = teamsMap.keys.toList()..sort();
+      final originalTeams = teamsMap.keys.toList();
       final sortedTeamsMap = <String, List<Sticker>>{};
 
-      for (var team in sortedTeams) {
+      for (var team in originalTeams) {
         sortedTeamsMap[team] = teamsMap[team]!;
       }
       sortedMap[group] = sortedTeamsMap;
     }
-
     return sortedMap;
   }
 
