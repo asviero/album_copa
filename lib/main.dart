@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'providers/album_provider.dart';
 import 'screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GoogleFonts.pendingFonts([GoogleFonts.inter()]);
+
+  final prefs = await SharedPreferences.getInstance();
 
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => AlbumProvider())],
+      providers: [ChangeNotifierProvider(create: (_) => AlbumProvider(prefs))],
       child: const AlbumCopaApp(),
     ),
   );
