@@ -49,33 +49,33 @@ class AlbumProvider with ChangeNotifier {
   void _generateInitialStickers() {
     final groups = {
       'Grupo A': {
+        'MEX': 'México',
         'RSA': 'África do Sul',
         'KOR': 'Coreia do Sul',
-        'MEX': 'México',
         'CZE': 'República Tcheca',
       },
       'Grupo B': {
-        'BIH': 'Bósnia e Herzegovina',
         'CAN': 'Canadá',
+        'BIH': 'Bósnia e Herzegovina',
         'QAT': 'Catar',
         'SUI': 'Suíça',
       },
       'Grupo C': {
         'BRA': 'Brasil',
-        'SCO': 'Escócia',
-        'HAI': 'Haiti',
         'MAR': 'Marrocos',
+        'HAI': 'Haiti',
+        'SCO': 'Escócia',
       },
       'Grupo D': {
-        'AUS': 'Austrália',
         'USA': 'Estados Unidos',
         'PAR': 'Paraguai',
+        'AUS': 'Austrália',
         'TUR': 'Turquia',
       },
       'Grupo E': {
         'GER': 'Alemanha',
-        'CIV': 'Costa do Marfim',
         'CUW': 'Curaçao',
+        'CIV': 'Costa do Marfim',
         'ECU': 'Equador',
       },
       'Grupo F': {
@@ -91,33 +91,33 @@ class AlbumProvider with ChangeNotifier {
         'NZL': 'Nova Zelândia',
       },
       'Grupo H': {
-        'KSA': 'Arábia Saudita',
-        'CPV': 'Cabo Verde',
         'ESP': 'Espanha',
+        'CPV': 'Cabo Verde',
+        'KSA': 'Arábia Saudita',
         'URU': 'Uruguai',
       },
       'Grupo I': {
         'FRA': 'França',
+        'SEN': 'Senegal',
         'IRQ': 'Iraque',
         'NOR': 'Noruega',
-        'SEN': 'Senegal',
       },
       'Grupo J': {
-        'ALG': 'Argélia',
         'ARG': 'Argentina',
+        'ALG': 'Argélia',
         'AUT': 'Áustria',
         'JOR': 'Jordânia',
       },
       'Grupo K': {
-        'COL': 'Colômbia',
         'POR': 'Portugal',
         'COD': 'RD Congo',
         'UZB': 'Uzbequistão',
+        'COL': 'Colômbia',
       },
       'Grupo L': {
+        'ENG': 'Inglaterra',
         'CRO': 'Croácia',
         'GHA': 'Gana',
-        'ENG': 'Inglaterra',
         'PAN': 'Panamá',
       },
     };
@@ -139,6 +139,30 @@ class AlbumProvider with ChangeNotifier {
         }
       });
     });
+
+    // Fifa World Cup
+    for (int i = 1; i <= 19; i++) {
+      _stickers.add(
+        Sticker(
+          code: 'FWC $i',
+          team: 'Fifa World Cup',
+          type: 'Especial',
+          group: 'Especiais',
+        ),
+      );
+    }
+
+    // Coca-Cola
+    for (int i = 1; i <= 14; i++) {
+      _stickers.add(
+        Sticker(
+          code: 'CC$i',
+          team: 'Coca-Cola',
+          type: 'Especial',
+          group: 'Especiais',
+        ),
+      );
+    }
   }
 
   // --- SALVAMENTO---
