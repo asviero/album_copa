@@ -1,17 +1,56 @@
-# album_copa
+# 📒 Álbum Copa 2026
 
-A new Flutter project.
+Aplicativo mobile para controlar sua coleção de figurinhas da Copa do Mundo 2026.
 
-## Getting Started
+## Funcionalidades
 
-This project is a starting point for a Flutter application.
+- Marcar e desmarcar figurinhas como coletadas
+- Visualização por grupos e seleções
+- Barra de progresso geral e por time
+- Indicador de time completo
+- Dados salvos localmente no dispositivo
 
-A few resources to get you started if this is your first Flutter project:
+## Tecnologias
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- [Flutter](https://flutter.dev/) — framework mobile
+- [Provider](https://pub.dev/packages/provider) — gerenciamento de estado
+- [Shared Preferences](https://pub.dev/packages/shared_preferences) — persistência local
+- [Google Fonts](https://pub.dev/packages/google_fonts) — tipografia (Inter)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Como rodar
+
+```bash
+# Instalar dependências
+flutter pub get
+
+# Rodar em modo debug
+flutter run
+
+# Gerar APK de produção
+flutter build apk --release --split-per-abi
+```
+
+## Estrutura
+
+```
+lib/
+├── main.dart
+├── models/
+│   └── sticker.dart
+├── providers/
+│   └── album_provider.dart
+├── screens/
+│   └── home_screen.dart
+└── widgets/
+    └── sticker_card.dart
+```
+
+## Dados do álbum
+
+12 grupos · 48 seleções · 20 figurinhas por time ·
+1 grupo especial · 19 figurinhas da Fifa World Cup · 14 figurinhas da Coca-Cola
+**993 figurinhas no total**
+
+---
+
+Desenvolvido por [@asviero](https://github.com/asviero)
