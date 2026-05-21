@@ -47,8 +47,9 @@ lib/
 
 ## Dados do álbum
 
-12 grupos · 48 seleções · 20 figurinhas por time ·
-1 grupo especial · 19 figurinhas da Fifa World Cup · 14 figurinhas da Coca-Cola
+12 grupos · 48 seleções · 20 figurinhas por time
+1 grupo especial · 19 figurinhas da FIFA World Cup · 14 figurinhas da Coca-Cola
+ 
 **993 figurinhas no total**
 
 ---
